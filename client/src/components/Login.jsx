@@ -1,12 +1,49 @@
-import { Fragment, useRef, useState } from 'react'
+import { Fragment, useRef, useContext, useState } from 'react'
+import axios from 'axios'
 import { Dialog, Transition } from '@headlessui/react'
 import { ExclamationTriangleIcon } from '@heroicons/react/24/outline'
+import { auth, provider, provider2 } from '../firebase'
+import { Link, useNavigate, useLocation } from 'react-router-dom'
+import { signInWithPopup } from 'firebase/auth'
+import { AuthContext } from '../context/AuthContext'
 
 export default function Login({ closeLogin }) {
+  // const [user, setUser] = useState('')
   const [open, setOpen] = useState(true)
+
+  const { user, loading, error, dispatch } = useContext(AuthContext)
+  const navigate = useNavigate()
 
   const cancelButtonRef = useRef(null)
 
+  const signInWithGoogle = async () => {
+    dispatch({ type: 'LOGIN_START' })
+
+    signInWithPopup(auth, provider)
+      .then((result) => {
+        console.log(result)
+        axios
+          .post('/auth/google', {
+            name: result.user.displayName,
+            email: result.user.email,
+            img: result.user.photoURL,
+          })
+          .then((res) => {
+            console.log(res)
+            dispatch({ type: 'LOGIN_SUCCESS', payload: res.data })
+            // close the google login
+            // setOpen((prevState) => !prevState)
+            // setUser(res.data)
+            navigate('/')
+          })
+      })
+      .catch((err) => {
+        console.log('@@@@@@@@@@@@@@@@@', err)
+        dispatch({ type: 'LOGIN_FAILURE', payload: err.response.data })
+      })
+  }
+
+  console.log('~~~~~~~~~~~~~~~~~~~~', user)
   return (
     <Transition.Root
       show={open}
@@ -32,7 +69,7 @@ export default function Login({ closeLogin }) {
         </Transition.Child>
 
         <div className='fixed inset-0 z-10 overflow-y-auto'>
-          <div className='flex min-h-full items-end justify-center p-4 text-center sm:items-center sm:p-0'>
+          <div className='flex min-h-full items-center justify-center p-4 text-center sm:items-center sm:p-0'>
             <Transition.Child
               as={Fragment}
               enter='ease-out duration-300'
@@ -47,7 +84,7 @@ export default function Login({ closeLogin }) {
                   <button
                     type='button'
                     className=' w-1/2 rounded-md bg-blue-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-red-500 sm:ml-3 sm:w-auto'
-                    // onClick={() => setOpen(false)}
+                    onClick={signInWithGoogle}
                   >
                     Google Login
                   </button>
