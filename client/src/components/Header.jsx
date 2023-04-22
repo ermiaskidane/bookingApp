@@ -1,4 +1,4 @@
-import { Fragment, useState } from 'react'
+import { Fragment, useState, useContext } from 'react'
 import { Dialog, Disclosure, Popover, Transition } from '@headlessui/react'
 import {
   ArrowPathIcon,
@@ -16,6 +16,7 @@ import {
 } from '@heroicons/react/20/solid'
 import { Link, useNavigate, useLocation } from 'react-router-dom'
 import Login from './Login'
+import { AuthContext } from '../context/AuthContext'
 
 const products = [
   {
@@ -60,7 +61,9 @@ function classNames(...classes) {
 
 export default function Example({ openLogin }) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
+  const { user, loading, error, dispatch } = useContext(AuthContext)
 
+  // console.log(user)
   return (
     <header className='bg-gray-700'>
       <nav
@@ -113,17 +116,40 @@ export default function Example({ openLogin }) {
             Company
           </Link>
         </Popover.Group>
-        <div
-          className='hidden lg:flex lg:flex-1 lg:justify-end'
-          onClick={() => openLogin(true)}
-        >
-          <Link
-            to='/'
-            className='text-sm font-semibold leading-6 text-gray-900'
+        {user ? (
+          <div className='hidden lg:flex lg:flex-1 lg:justify-end'>
+            <img
+              class='h-8 w-8 rounded-full object-cover mx-1'
+              src={
+                user.img ||
+                'https://images.unsplash.com/photo-1494790108377-be9c29b29330?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=334&q=80'
+              }
+              alt='avatar'
+            />
+
+            <p class='text-gray-900 text-sm mx-2 flex gap-4 '>
+              <Link class='font-bold mt-1 block capitalize'>{user.name}</Link>
+              <Link
+                class='font-bold mt-1 block capitalize'
+                onClick={() => dispatch({ type: 'LOGOUT' })}
+              >
+                Log out
+              </Link>
+            </p>
+          </div>
+        ) : (
+          <div
+            className='hidden lg:flex lg:flex-1 lg:justify-end'
+            onClick={() => openLogin(true)}
           >
-            Log in <span aria-hidden='true'>&rarr;</span>
-          </Link>
-        </div>
+            <Link
+              to='/'
+              className='text-sm font-semibold leading-6 text-gray-900'
+            >
+              Log in <span aria-hidden='true'>&rarr;</span>
+            </Link>
+          </div>
+        )}
       </nav>
       <Dialog
         as='div'
