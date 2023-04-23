@@ -1,14 +1,25 @@
-import React, { useState } from 'react'
+import React, { useContext, useState, useEffect } from 'react'
 import moment from 'moment'
+import axios from 'axios'
 import FullCalendar, { formatDate } from '@fullcalendar/react'
 import dayGridPlugin from '@fullcalendar/daygrid'
 import timeGridPlugin from '@fullcalendar/timegrid'
 import interactionPlugin from '@fullcalendar/interaction'
 import listPlugin from '@fullcalendar/list'
+import { BookingContext } from '../context/BookingContext'
 
 function Home() {
   const [currentEvents, setCurrentEvents] = useState([])
+  // const [currentEvent, loading, error, dispatch] = useContext(BookingContext)
+  // console.log('####################', currentEvent)
 
+  useEffect(() => {
+    ;(async () => {
+      await axios.post('http://localhost:8800/api/book/event', {
+        currentEvents,
+      })
+    })()
+  }, [currentEvents])
   const handleDateClick = (selected) => {
     const title = prompt('Please enter a new title for your event')
     console.log(selected)
@@ -39,6 +50,17 @@ function Home() {
       selected.event.remove()
     }
   }
+
+  // const currentEventsHanlder = async (events) => {
+  //   try {
+  //     await dispatch({
+  //       type: 'BOOKING_SUCCESS',
+  //       payload: events,
+  //     })
+  //   } catch (err) {
+  //     console.log(error)
+  //   }
+  // }
   return (
     <div className='bg-gray-500 pt-3 flex '>
       <div className='w-1/5'>
@@ -74,6 +96,8 @@ function Home() {
           dayMaxEvents={true}
           select={handleDateClick}
           eventClick={handleEventClick}
+          // eventsSet={(events) => currentEventsHanlder(events)}
+          // eventsSet={(events) => console.log(Object.entries(events))}
           eventsSet={(events) => setCurrentEvents(events)}
           initialEvents={[
             {

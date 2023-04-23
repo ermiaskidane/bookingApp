@@ -4,6 +4,7 @@ import dotenv from 'dotenv'
 import cookieParser from 'cookie-parser'
 import cors from 'cors'
 import authRoutes from './routes/auth.js'
+import BookingRoutes from './routes/booking.js'
 
 const app = express()
 dotenv.config()
@@ -32,6 +33,7 @@ app.use((req, res, next) => {
 app.use(cookieParser())
 app.use(express.json())
 app.use('/api/auth', authRoutes)
+app.use('/api/book', BookingRoutes)
 
 //error handler
 app.use((err, req, res, next) => {
