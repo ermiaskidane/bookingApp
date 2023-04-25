@@ -11,15 +11,25 @@ import { BookingContext } from '../context/BookingContext'
 function Home() {
   const [currentEvents, setCurrentEvents] = useState([])
   // const [currentEvent, loading, error, dispatch] = useContext(BookingContext)
-  // console.log('####################', currentEvent)
+  console.log('####################', currentEvents)
 
-  useEffect(() => {
-    ;(async () => {
-      await axios.post('http://localhost:8800/api/book/event', {
-        currentEvents,
-      })
-    })()
-  }, [currentEvents])
+  // useEffect(() => {
+  //   // const [{ allDay }, { title }, start, end = null] = currentEvents
+  //   // console.log('>>>>>>>>>>>', allDay)
+
+  //   ;(async () => {
+  //     await Promise.all(
+  //       currentEvents.map(async (task) => {
+  //         await axios.post('http://localhost:8800/api/book/event', task)
+  //       })
+  //     )
+  //   })()
+  // }, [currentEvents])
+
+  const logMessage = (message) => {
+    console.log(message)
+  }
+
   const handleDateClick = (selected) => {
     const title = prompt('Please enter a new title for your event')
     console.log(selected)
@@ -41,25 +51,45 @@ function Home() {
     console.log('>>>>>>>>>>>>>>>>>>>>', calendarApi)
   }
 
-  const handleEventClick = (selected) => {
-    if (
-      window.confirm(
-        `Are you sure you want to delete the event '${selected.event.title}'`
+  const handleEventClick = (selected, event) => {
+    console.log('??????????????', event)
+    ;(async () => {
+      await Promise.all(
+        currentEvents.map(async (task) => {
+          await axios.post('http://localhost:8800/api/book/event', task)
+        })
       )
-    ) {
-      selected.event.remove()
-    }
+    })()
+    // if (
+    //   window.confirm(
+    //     `Are you sure you want to delete the event '${selected.event.title}'`
+    //   )
+    // ) {
+    //   selected.event.remove()
+    // }
   }
 
-  // const currentEventsHanlder = async (events) => {
+  // const handleBackendEvent = async (events) => {
+  //   setCurrentEvents(events)
   //   try {
-  //     await dispatch({
-  //       type: 'BOOKING_SUCCESS',
-  //       payload: events,
-  //     })
+  //     ;(async () => {
+  //       await Promise.all(
+  //         currentEvents.map(async (task) => {
+  //           await axios.post('http://localhost:8800/api/book/event', task)
+  //         })
+  //       )
+  //     })()
   //   } catch (err) {
-  //     console.log(error)
+  //     console.log(err)
   //   }
+  // try {
+  //   await dispatch({
+  //     type: 'BOOKING_SUCCESS',
+  //     payload: events,
+  //   })
+  // } catch (err) {
+  //   console.log(error)
+  // }
   // }
   return (
     <div className='bg-gray-500 pt-3 flex '>
@@ -97,8 +127,9 @@ function Home() {
           select={handleDateClick}
           eventClick={handleEventClick}
           // eventsSet={(events) => currentEventsHanlder(events)}
-          // eventsSet={(events) => console.log(Object.entries(events))}
+          // eventsSet={(events) => console.log(events)}
           eventsSet={(events) => setCurrentEvents(events)}
+          customFunction={() => logMessage('test one two')}
           initialEvents={[
             {
               id: '12315',
